@@ -119,6 +119,12 @@ export default function MatchDetailPage({ params }: { params: Promise<{ matchId:
           </div>
         )}
 
+        {offerTrip.notes && (
+          <div className="rounded-2xl border border-dashed border-border p-3.5 text-xs leading-relaxed text-muted-foreground">
+            {offerTrip.notes}
+          </div>
+        )}
+
         <div className="space-y-2 rounded-2xl border border-border p-3.5">
           <Row label="Điểm đón" value={offerTrip.route.origin.label} />
           <Row label="Điểm đến" value={offerTrip.route.destination.label} />

@@ -158,6 +158,15 @@ export default function MatchResultsPage({ params }: { params: Promise<{ id: str
                   <Progress value={overlapPercent * 100} className="h-1.5" />
                 </div>
 
+                {trip.genderPreference && trip.genderPreference !== "any" && (
+                  <p className="mt-2 text-[11px] font-medium text-brand-blue">
+                    {trip.genderPreference === "female-only" ? "Chỉ nhận khách nữ" : "Chỉ nhận khách nam"}
+                  </p>
+                )}
+                {trip.notes && (
+                  <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">{trip.notes}</p>
+                )}
+
                 <Button
                   className="mt-3.5 h-10 w-full rounded-xl"
                   onClick={() => confirm(trip.id, overlapPercent, sharedDistanceKm)}

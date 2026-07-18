@@ -81,6 +81,58 @@ const ROUTES: Record<string, { origin: string; destination: string; pts: [number
       [10.7725, 106.698],
     ],
   },
+  // Kịch bản demo cứng theo pitch deck của nhóm
+  ktxB_spkt: {
+    origin: "KTX Khu B, ĐHQG TP.HCM",
+    destination: "Đại học Sư phạm Kỹ thuật TP.HCM (SPKT)",
+    pts: [
+      [10.8823, 106.7829],
+      [10.8795, 106.7975],
+      [10.871, 106.802],
+      [10.85, 106.771],
+      [10.8493, 106.7712],
+    ],
+  },
+  suoiTien_spkt: {
+    origin: "Suối Tiên, TP. Thủ Đức",
+    destination: "Đại học Sư phạm Kỹ thuật TP.HCM (SPKT)",
+    pts: [
+      [10.871, 106.802],
+      [10.85, 106.771],
+      [10.8493, 106.7712],
+    ],
+  },
+  vincom_sanBay: {
+    origin: "Vincom Plaza Thủ Đức",
+    destination: "Sân bay Tân Sơn Nhất",
+    pts: [
+      [10.8483, 106.7666],
+      [10.8256, 106.7168],
+      [10.812, 106.678],
+      [10.8014, 106.6583],
+    ],
+  },
+  q7_vungTau: {
+    origin: "Phú Mỹ Hưng, Quận 7",
+    destination: "Bãi Sau, Vũng Tàu",
+    pts: [
+      [10.7297, 106.7188],
+      [10.6979, 106.7469],
+      [10.5322, 106.9878],
+      [10.42, 107.0],
+      [10.3665, 107.0843],
+    ],
+  },
+  spkt_aeonBinhTan: {
+    origin: "Đại học Sư phạm Kỹ thuật TP.HCM (SPKT)",
+    destination: "Aeon Mall Bình Tân",
+    pts: [
+      [10.8493, 106.7712],
+      [10.815, 106.71],
+      [10.78, 106.65],
+      [10.7469, 106.6127],
+    ],
+  },
 };
 
 function makeRoute(key: keyof typeof ROUTES): RoutePlan {
@@ -225,6 +277,96 @@ export function buildSeedUsers(): User[] {
       ratingAvg: 4.5,
       ratingCount: 6,
     },
+    // Kịch bản demo cứng theo pitch deck của nhóm
+    {
+      id: "u-anhA",
+      name: "Anh A",
+      phone: "0909111000",
+      gender: "male",
+      trustScore: 94,
+      roleMode: "driver",
+      vehicle: { type: "car", brand: "Mitsubishi", model: "Xpander", plate: "61A-123.45", color: "Bạc", seats: 7 },
+      walletBalance: 530000,
+      moneySaved: 1050000,
+      co2SavedKg: 22.6,
+      tripsCount: 38,
+      ratingAvg: 4.92,
+      ratingCount: 35,
+    },
+    {
+      id: "u-vincom",
+      name: "Trần Văn Phúc",
+      phone: "0909222000",
+      gender: "male",
+      trustScore: 89,
+      roleMode: "driver",
+      vehicle: { type: "car", brand: "Toyota", model: "Innova", plate: "51H-678.90", color: "Đen", seats: 7 },
+      walletBalance: 480000,
+      moneySaved: 890000,
+      co2SavedKg: 16.8,
+      tripsCount: 24,
+      ratingAvg: 4.8,
+      ratingCount: 22,
+    },
+    {
+      id: "u-vungtau",
+      name: "Lâm Quốc Bảo",
+      phone: "0909333000",
+      gender: "male",
+      trustScore: 92,
+      roleMode: "driver",
+      vehicle: { type: "car", brand: "Hyundai", model: "Santa Fe", plate: "51F-234.56", color: "Trắng", seats: 6 },
+      walletBalance: 610000,
+      moneySaved: 1420000,
+      co2SavedKg: 31.5,
+      tripsCount: 15,
+      ratingAvg: 4.88,
+      ratingCount: 14,
+    },
+    {
+      id: "u-motoKtx",
+      name: "Nguyễn Hữu Tâm",
+      phone: "0909444000",
+      gender: "male",
+      trustScore: 87,
+      roleMode: "driver",
+      vehicle: { type: "motorbike", brand: "Honda", model: "Winner X", plate: "61B1-789.01", color: "Đỏ", seats: 1 },
+      walletBalance: 150000,
+      moneySaved: 380000,
+      co2SavedKg: 5.4,
+      tripsCount: 16,
+      ratingAvg: 4.7,
+      ratingCount: 15,
+    },
+    {
+      id: "u-motoAeon",
+      name: "Vũ Thị Kim Ngân",
+      phone: "0909555000",
+      gender: "female",
+      trustScore: 90,
+      roleMode: "driver",
+      vehicle: { type: "motorbike", brand: "Honda", model: "Vision", plate: "61B2-345.67", color: "Trắng", seats: 1 },
+      walletBalance: 210000,
+      moneySaved: 460000,
+      co2SavedKg: 6.7,
+      tripsCount: 20,
+      ratingAvg: 4.85,
+      ratingCount: 19,
+    },
+    {
+      id: "u-svKtxA",
+      name: "Sinh viên Khu A",
+      phone: "0909666000",
+      gender: "male",
+      trustScore: 80,
+      roleMode: "rider",
+      walletBalance: 60000,
+      moneySaved: 90000,
+      co2SavedKg: 1.4,
+      tripsCount: 3,
+      ratingAvg: 4.6,
+      ratingCount: 3,
+    },
   ];
 
   return base.map((u) => ({
@@ -250,6 +392,10 @@ interface SeedTripSpec {
   ratePerKm: number;
   detour: number;
   recurring: Trip["recurring"];
+  dayOffset?: number;
+  notes?: string;
+  maxPickupPoints?: number;
+  genderPreference?: Trip["genderPreference"];
 }
 
 const SPECS: SeedTripSpec[] = [
@@ -260,12 +406,95 @@ const SPECS: SeedTripSpec[] = [
   { ownerId: "u-huy", routeKey: "q7_alt_q1", kind: "request", hour: 7, minute: 25, seats: 1, ratePerKm: 2900, detour: 0.3, recurring: "weekdays" },
   { ownerId: "u-linh", routeKey: "binhThanh_q1", kind: "request", hour: 7, minute: 40, seats: 1, ratePerKm: 3000, detour: 0.2, recurring: "weekdays" },
   { ownerId: "u-mai", routeKey: "tanBinh_q1", kind: "request", hour: 8, minute: 0, seats: 1, ratePerKm: 3100, detour: 0.15, recurring: "once" },
+
+  // --- 5 kịch bản cứng từ pitch deck ---
+  // Scenario 1: Ô tô 7 chỗ, nhiều điểm đón, KTX Khu B -> SPKT
+  {
+    ownerId: "u-anhA",
+    routeKey: "ktxB_spkt",
+    kind: "offer",
+    hour: 7,
+    minute: 30,
+    seats: 4,
+    ratePerKm: 2600,
+    detour: 0.18, // cho phép đón lệch ~800m
+    recurring: "weekdays",
+    notes: "Cho phép đón lệch 800m · Đón tối đa 3 điểm · Không hút thuốc · Không mang thú cưng",
+    maxPickupPoints: 3,
+  },
+  // Sinh viên khớp đúng đoạn giữa tuyến scenario 1 (Suối Tiên -> SPKT)
+  {
+    ownerId: "u-svKtxA",
+    routeKey: "suoiTien_spkt",
+    kind: "request",
+    hour: 7,
+    minute: 30,
+    seats: 1,
+    ratePerKm: 2600,
+    detour: 0.2,
+    recurring: "weekdays",
+  },
+  // Scenario 2: Ô tô 7 chỗ, hành lý, Vincom Thủ Đức -> Sân bay Tân Sơn Nhất
+  {
+    ownerId: "u-vincom",
+    routeKey: "vincom_sanBay",
+    kind: "offer",
+    hour: 5,
+    minute: 0,
+    seats: 3,
+    ratePerKm: 4200,
+    detour: 0.1,
+    recurring: "once",
+    notes: "Nhận hành lý cỡ lớn · Chia tiền cầu đường · Giờ cao điểm có thể kẹt xe, ETA có thể thay đổi",
+  },
+  // Scenario 3: Ô tô, chuyến dài liên tỉnh, Quận 7 -> Vũng Tàu, hẹn trước 2 ngày
+  {
+    ownerId: "u-vungtau",
+    routeKey: "q7_vungTau",
+    kind: "offer",
+    hour: 6,
+    minute: 0,
+    dayOffset: 2,
+    seats: 3,
+    ratePerKm: 2200,
+    detour: 0.05,
+    recurring: "once",
+    notes: "Chuyến đi Vũng Tàu 2 ngày tới · Ưu tiên ghép người cùng giới tính · Yêu cầu thanh toán cọc trước",
+  },
+  // Scenario 4: Xe máy, 1 khách, KTX Khu B -> SPKT
+  {
+    ownerId: "u-motoKtx",
+    routeKey: "ktxB_spkt",
+    kind: "offer",
+    hour: 6,
+    minute: 45,
+    seats: 1,
+    ratePerKm: 2000,
+    detour: 0.1, // đón lệch 200m
+    recurring: "weekdays",
+    notes: "Đón lệch tối đa 200m · Bắt buộc đội mũ bảo hiểm · Đã xác minh GPLX",
+  },
+  // Scenario 5: Xe máy buổi tối, SPKT -> Aeon Mall Bình Tân, ưu tiên nữ
+  {
+    ownerId: "u-motoAeon",
+    routeKey: "spkt_aeonBinhTan",
+    kind: "offer",
+    hour: 19,
+    minute: 30,
+    seats: 1,
+    ratePerKm: 2100,
+    detour: 0.15,
+    recurring: "weekdays",
+    notes: "Khởi hành buổi tối · Ưu tiên nhận khách nữ",
+    genderPreference: "female-only",
+  },
 ];
 
-function nextDepart(hour: number, minute: number): string {
+function nextDepart(hour: number, minute: number, dayOffset = 0): string {
   const d = new Date();
+  d.setDate(d.getDate() + dayOffset);
   d.setHours(hour, minute, 0, 0);
-  if (d.getTime() < Date.now()) d.setDate(d.getDate() + 1);
+  if (dayOffset === 0 && d.getTime() < Date.now()) d.setDate(d.getDate() + 1);
   return d.toISOString();
 }
 
@@ -277,13 +506,16 @@ export function buildSeedTrips(): Trip[] {
       ownerId: s.ownerId,
       kind: s.kind,
       route,
-      departAt: nextDepart(s.hour, s.minute),
+      departAt: nextDepart(s.hour, s.minute, s.dayOffset ?? 0),
       recurring: s.recurring,
       seats: s.seats,
       pricePerSeat: Math.round((route.distanceKm * s.ratePerKm) / 1000) * 1000,
       detourTolerance: s.detour,
       status: "open",
       createdAt: new Date().toISOString(),
+      notes: s.notes,
+      maxPickupPoints: s.maxPickupPoints,
+      genderPreference: s.genderPreference,
     };
   });
 }

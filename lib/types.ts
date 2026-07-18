@@ -59,6 +59,9 @@ export interface Trip {
   detourTolerance: number; // 0-1
   status: TripStatus;
   createdAt: string;
+  notes?: string; // driver/rider constraints e.g. "Không hút thuốc · Tối đa 3 điểm đón"
+  maxPickupPoints?: number;
+  genderPreference?: "any" | "female-only" | "male-only";
 }
 
 export type MatchStatus =
