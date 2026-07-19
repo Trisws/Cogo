@@ -2,7 +2,7 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, MapPin, Navigation, Minus, Plus, Repeat } from "lucide-react";
+import { Loader2, MapPin, Navigation, Minus, Plus, Repeat, Bike, Car, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import { ScreenHeader } from "@/components/app-shell/screen-header";
 import { LocationPicker } from "@/components/map/location-picker";
@@ -20,6 +20,19 @@ const RECURRING_OPTIONS: { value: Trip["recurring"]; label: string }[] = [
   { value: "daily", label: "Hàng ngày" },
 ];
 
+function toDateInputValue(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
+  const h = String(Math.floor(i / 2)).padStart(2, "0");
+  const m = i % 2 === 0 ? "00" : "30";
+  return `${h}:${m}`;
+});
+
 function NewTripForm() {
   const router = useRouter();
   const params = useSearchParams();
@@ -29,12 +42,15 @@ function NewTripForm() {
 
   const [origin, setOrigin] = useState<GeocodeResult | null>(null);
   const [destination, setDestination] = useState<GeocodeResult | null>(null);
-  const [dayOffset, setDayOffset] = useState(0);
+  const [date, setDate] = useState(() => toDateInputValue(new Date()));
   const [time, setTime] = useState("07:30");
   const [recurring, setRecurring] = useState<Trip["recurring"]>("weekdays");
   const [seats, setSeats] = useState(1);
   const [detour, setDetour] = useState([20]);
+  const [vehiclePreference, setVehiclePreference] = useState<"any" | "motorbike" | "car">("any");
   const [loading, setLoading] = useState(false);
+
+  const todayStr = useMemo(() => toDateInputValue(new Date()), []);
 
   const distanceKm = useMemo(() => {
     if (!origin || !destination) return 0;
@@ -49,7 +65,8 @@ function NewTripForm() {
       return;
     }
     if (kind === "offer" && !me.vehicle) {
-      toast.error("Bạn cần đăng ký thông tin xe trong phần Cá nhân trước.");
+      toast.error("Bạn cần đăng ký xe trước khi đăng chuyến.");
+      router.push("/vehicle-setup");
       return;
     }
     setLoading(true);
@@ -58,9 +75,8 @@ function NewTripForm() {
       { lat: destination.lat, lng: destination.lng }
     );
     const [h, m] = time.split(":").map(Number);
-    const departDate = new Date();
-    departDate.setDate(departDate.getDate() + dayOffset);
-    departDate.setHours(h, m, 0, 0);
+    const [y, mo, d] = date.split("-").map(Number);
+    const departDate = new Date(y, mo - 1, d, h, m, 0, 0);
     if (departDate.getTime() < Date.now()) {
       departDate.setDate(departDate.getDate() + 1);
     }
@@ -76,6 +92,8 @@ function NewTripForm() {
       departAt: departDate.toISOString(),
       recurring,
       seats,
+      vehicleType: kind === "offer" ? me.vehicle?.type : undefined,
+      vehicleTypePreference: kind === "request" ? vehiclePreference : undefined,
       pricePerSeat: suggestedPrice || 20000,
       detourTolerance: detour[0] / 100,
     });
@@ -109,20 +127,28 @@ function NewTripForm() {
         </div>
 
         <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">Thời gian khởi hành</p>
+          <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+            <CalendarDays className="size-3.5" /> Thời gian khởi hành
+          </p>
           <div className="flex gap-2">
-            <SegButton active={dayOffset === 0} onClick={() => setDayOffset(0)}>
-              Hôm nay
-            </SegButton>
-            <SegButton active={dayOffset === 1} onClick={() => setDayOffset(1)}>
-              Ngày mai
-            </SegButton>
             <input
-              type="time"
+              type="date"
+              value={date}
+              min={todayStr}
+              onChange={(e) => setDate(e.target.value)}
+              className="h-10 flex-1 rounded-xl border border-border bg-background px-3 text-sm"
+            />
+            <select
               value={time}
               onChange={(e) => setTime(e.target.value)}
               className="h-10 flex-1 rounded-xl border border-border bg-background px-3 text-sm"
-            />
+            >
+              {TIME_OPTIONS.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -137,6 +163,37 @@ function NewTripForm() {
               </SegButton>
             ))}
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">Phương tiện</p>
+          {kind === "offer" ? (
+            <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
+              {me.vehicle?.type === "car" ? (
+                <Car className="size-5 text-brand-blue" />
+              ) : (
+                <Bike className="size-5 text-brand-blue" />
+              )}
+              <div className="min-w-0 flex-1 text-xs">
+                <p className="font-medium">
+                  {me.vehicle ? `${me.vehicle.brand} ${me.vehicle.model} · ${me.vehicle.color}` : "Chưa đăng ký xe"}
+                </p>
+                <p className="text-muted-foreground">Xe đăng ký trong hồ sơ của bạn</p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <SegButton active={vehiclePreference === "any"} onClick={() => setVehiclePreference("any")}>
+                Bất kỳ
+              </SegButton>
+              <SegButton active={vehiclePreference === "motorbike"} onClick={() => setVehiclePreference("motorbike")}>
+                <Bike className="size-3.5" /> Xe máy
+              </SegButton>
+              <SegButton active={vehiclePreference === "car"} onClick={() => setVehiclePreference("car")}>
+                <Car className="size-3.5" /> Ô tô
+              </SegButton>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-between rounded-2xl border border-border p-4">
@@ -206,7 +263,7 @@ function SegButton({ active, onClick, children }: { active: boolean; onClick: ()
     <button
       onClick={onClick}
       className={cn(
-        "h-10 flex-1 rounded-xl border text-xs font-medium transition",
+        "flex h-10 flex-1 items-center justify-center gap-1 rounded-xl border text-xs font-medium transition",
         active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-foreground"
       )}
     >

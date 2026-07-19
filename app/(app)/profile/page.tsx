@@ -77,19 +77,38 @@ export default function ProfilePage() {
               <p className="text-[11px] text-muted-foreground">Bật để đăng chuyến cho người khác đi cùng</p>
             </div>
           </div>
-          <Switch checked={me.roleMode === "driver"} onCheckedChange={(v) => setRoleMode(v ? "driver" : "rider")} />
+          <Switch
+            checked={me.roleMode === "driver"}
+            onCheckedChange={(v) => {
+              if (v && !me.vehicle) {
+                router.push("/vehicle-setup");
+                return;
+              }
+              setRoleMode(v ? "driver" : "rider");
+            }}
+          />
         </div>
 
-        {me.vehicle && (
-          <div className="flex items-center gap-3 rounded-2xl bg-muted/60 p-4">
+        {me.vehicle ? (
+          <Link href="/vehicle-setup" className="flex items-center gap-3 rounded-2xl bg-muted/60 p-4">
             <Car className="size-5 text-brand-blue" />
-            <div className="text-xs">
+            <div className="min-w-0 flex-1 text-xs">
               <p className="font-medium">
                 {me.vehicle.brand} {me.vehicle.model} · {me.vehicle.color}
               </p>
               <p className="text-muted-foreground">Biển số {me.vehicle.plate} · {me.vehicle.seats} chỗ</p>
             </div>
-          </div>
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+          </Link>
+        ) : (
+          <Link href="/vehicle-setup" className="flex items-center gap-3 rounded-2xl border border-dashed border-border p-4">
+            <Car className="size-5 text-muted-foreground" />
+            <div className="flex-1 text-xs">
+              <p className="font-medium">Chưa đăng ký xe</p>
+              <p className="text-muted-foreground">Đăng ký xe để bắt đầu cho đi chung</p>
+            </div>
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+          </Link>
         )}
 
         <div className="rounded-2xl border border-border p-4">

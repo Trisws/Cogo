@@ -46,6 +46,12 @@ export default function MatchResultsPage({ params }: { params: Promise<{ id: str
         return { trip: t, overlapPercent, sharedDistanceKm, owner: users[t.ownerId] };
       })
       .filter((c) => c.overlapPercent >= 0.2 && c.owner)
+      .filter((c) => {
+        const offer = myTrip.kind === "offer" ? myTrip : c.trip;
+        const request = myTrip.kind === "request" ? myTrip : c.trip;
+        if (!request.vehicleTypePreference || request.vehicleTypePreference === "any") return true;
+        return offer.vehicleType === request.vehicleTypePreference;
+      })
       .sort((a, b) => b.overlapPercent - a.overlapPercent);
   }, [myTrip, oppositeKind, trips, users, me.id]);
 

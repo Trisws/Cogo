@@ -62,6 +62,8 @@ export interface Trip {
   notes?: string; // driver/rider constraints e.g. "Không hút thuốc · Tối đa 3 điểm đón"
   maxPickupPoints?: number;
   genderPreference?: "any" | "female-only" | "male-only";
+  vehicleType?: "motorbike" | "car"; // for offers: actual vehicle used
+  vehicleTypePreference?: "any" | "motorbike" | "car"; // for requests: desired vehicle type
 }
 
 export type MatchStatus =
