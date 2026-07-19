@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, MapPin, Navigation, Minus, Plus, Repeat, Bike, Car, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
@@ -51,6 +51,11 @@ function NewTripForm() {
   const [loading, setLoading] = useState(false);
 
   const todayStr = useMemo(() => toDateInputValue(new Date()), []);
+  const needsVehicle = kind === "offer" && !me.vehicle;
+
+  useEffect(() => {
+    if (needsVehicle) router.replace("/vehicle-setup");
+  }, [needsVehicle, router]);
 
   const distanceKm = useMemo(() => {
     if (!origin || !destination) return 0;
@@ -64,9 +69,8 @@ function NewTripForm() {
       toast.error("Vui lòng chọn điểm đi và điểm đến.");
       return;
     }
-    if (kind === "offer" && !me.vehicle) {
-      toast.error("Bạn cần đăng ký xe trước khi đăng chuyến.");
-      router.push("/vehicle-setup");
+    if (needsVehicle) {
+      router.replace("/vehicle-setup");
       return;
     }
     setLoading(true);
@@ -99,6 +103,17 @@ function NewTripForm() {
     });
     setLoading(false);
     router.push(`/trips/${trip.id}/match`);
+  }
+
+  if (needsVehicle) {
+    return (
+      <div className="flex flex-col">
+        <ScreenHeader title="Đăng chuyến đi" />
+        <div className="flex flex-1 items-center justify-center p-10">
+          <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
   }
 
   return (

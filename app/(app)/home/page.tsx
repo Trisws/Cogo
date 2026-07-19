@@ -31,6 +31,10 @@ export default function HomePage() {
 
   function pickRole(mode: "rider" | "driver") {
     setRoleMode(mode);
+    if (mode === "driver" && !me.vehicle) {
+      router.push("/vehicle-setup");
+      return;
+    }
     router.push(`/trips/new?kind=${mode === "rider" ? "request" : "offer"}`);
   }
 
