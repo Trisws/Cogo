@@ -40,7 +40,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
-      <div className="relative h-52 w-full overflow-hidden">
+      <div className="relative h-64 w-full overflow-hidden">
         <RouteMap
           markers={[{ pos: { lat: 10.7769, lng: 106.7009 }, kind: "dot", color: "#1f8a53" }]}
           center={{ lat: 10.7769, lng: 106.7009 }}
@@ -64,7 +64,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="-mt-8 space-y-5 rounded-t-3xl bg-background px-4 pb-6 pt-5">
+      <div className="-mt-4 space-y-5 rounded-t-3xl bg-background px-4 pb-6 pt-5">
         <Link
           href="/trips/new"
           className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 shadow-sm"
