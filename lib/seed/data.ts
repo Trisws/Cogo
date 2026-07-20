@@ -133,6 +133,19 @@ const ROUTES: Record<string, { origin: string; destination: string; pts: [number
       [10.7469, 106.6127],
     ],
   },
+  // Toạ độ ước lượng theo vị trí thực tế (không phải khảo sát GPS chính xác),
+  // theo đúng cách hand-pick các route khác trong file này.
+  sihub_khucnc_q3: {
+    origin: "SIHUB - Cơ sở Khu Công nghệ cao, TP. Thủ Đức",
+    destination: "SIHUB - Trụ sở chính, 123 Trương Định, Quận 3",
+    pts: [
+      [10.841, 106.809],
+      [10.826, 106.779],
+      [10.803, 106.731],
+      [10.789, 106.696],
+      [10.782, 106.687],
+    ],
+  },
 };
 
 function makeRoute(key: keyof typeof ROUTES): RoutePlan {
@@ -487,6 +500,19 @@ const SPECS: SeedTripSpec[] = [
     recurring: "weekdays",
     notes: "Khởi hành buổi tối · Ưu tiên nhận khách nữ",
     genderPreference: "female-only",
+  },
+  // Demo bổ sung: kết nối 2 cơ sở SIHUB (Khu Công nghệ cao <-> Trụ sở chính Q.3)
+  {
+    ownerId: "u-tri",
+    routeKey: "sihub_khucnc_q3",
+    kind: "offer",
+    hour: 8,
+    minute: 0,
+    seats: 2,
+    ratePerKm: 3000,
+    detour: 0.15,
+    recurring: "once",
+    notes: "Demo: Kết nối 2 cơ sở SIHUB — Khu Công nghệ cao & Trụ sở chính Q.3",
   },
 ];
 

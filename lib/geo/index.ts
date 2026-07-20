@@ -102,6 +102,24 @@ export async function geocodeAddress(query: string): Promise<GeocodeResult[]> {
   }
 }
 
+/** Reverse geocoding via Nominatim: turns a GPS coordinate into a readable address. */
+export async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
+  try {
+    const url = new URL("https://nominatim.openstreetmap.org/reverse");
+    url.searchParams.set("lat", String(lat));
+    url.searchParams.set("lon", String(lng));
+    url.searchParams.set("format", "jsonv2");
+    const res = await fetch(url.toString(), {
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) return null;
+    const data: { display_name?: string } = await res.json();
+    return data.display_name ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Road-snapped route via the public OSRM demo server. Falls back to a
  * straight line (with a couple of interpolated points) if the request fails
