@@ -94,6 +94,35 @@ function uid(prefix: string) {
   return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+// Ước tính: cứ ~17 chuyến đi chung thì giải phóng được 1 chỗ đỗ xe cố định.
+// Đây là giả định demo (chưa có khảo sát thực tế), tách riêng thành hằng số
+// để dễ thay bằng số liệu thật khi có dữ liệu vận hành.
+const TRIPS_PER_PARKING_SPOT = 17;
+
+/** Chia một tổng số thành chuỗi tăng dần theo N mốc (dùng để minh hoạ xu hướng
+ * nhiều tháng/tuần từ một tổng tích luỹ hiện có — không phải lịch sử thật, vì
+ * hệ thống hiện chưa lưu số liệu theo từng kỳ). Cùng công thức với biểu đồ xu
+ * hướng ở trang Tác động cá nhân, để nhất quán trong toàn app. */
+function distributeGrowth(total: number, points: number): number[] {
+  const weights = Array.from({ length: points }, (_, i) => (i + 1) ** 1.3);
+  const sum = weights.reduce((a, b) => a + b, 0) || 1;
+  let cumulative = 0;
+  return weights.map((w) => {
+    cumulative += (w / sum) * total;
+    return Math.round(cumulative * 100) / 100;
+  });
+}
+
+function lastMonths(count: number): string[] {
+  const out: string[] = [];
+  const d = new Date();
+  for (let i = count - 1; i >= 0; i--) {
+    const m = new Date(d.getFullYear(), d.getMonth() - i, 1);
+    out.push(`${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0")}`);
+  }
+  return out;
+}
+
 function seedEnterprise(users: Record<string, User>): Record<string, EnterpriseAccount> {
   const byCompany: Record<string, EnterpriseAccount> = {
     "c-fpt": {
@@ -101,35 +130,50 @@ function seedEnterprise(users: Record<string, User>): Record<string, EnterpriseA
       companyName: "FPT Software",
       address: "Lô T2, Đường D1, Khu Công nghệ cao, TP. Thủ Đức",
       employees: [],
-      monthlyReports: [
-        { month: "2026-04", co2SavedKg: 142, tripsShared: 210, costSavedVnd: 18400000, parkingSpotsFreed: 12 },
-        { month: "2026-05", co2SavedKg: 168, tripsShared: 248, costSavedVnd: 21500000, parkingSpotsFreed: 14 },
-        { month: "2026-06", co2SavedKg: 205, tripsShared: 289, costSavedVnd: 25100000, parkingSpotsFreed: 17 },
-      ],
+      monthlyReports: [],
     },
     "c-intel": {
       id: "c-intel",
       companyName: "Intel Products Vietnam",
       address: "Lô I2, Đường D2, Khu Công nghệ cao, TP. Thủ Đức",
       employees: [],
-      monthlyReports: [
-        { month: "2026-04", co2SavedKg: 88, tripsShared: 130, costSavedVnd: 11200000, parkingSpotsFreed: 8 },
-        { month: "2026-05", co2SavedKg: 96, tripsShared: 145, costSavedVnd: 12900000, parkingSpotsFreed: 9 },
-        { month: "2026-06", co2SavedKg: 121, tripsShared: 172, costSavedVnd: 15300000, parkingSpotsFreed: 11 },
-      ],
+      monthlyReports: [],
     },
   };
+
+  // Cộng dồn CO2/số chuyến/tiền tiết kiệm thật từ chính các nhân viên đã gắn
+  // companyId, thay vì số liệu gõ tay cố định.
+  const totals: Record<string, { co2: number; trips: number; moneySaved: number }> = {};
   for (const u of Object.values(users)) {
-    if (u.companyId && byCompany[u.companyId]) {
-      byCompany[u.companyId].employees.push({
-        userId: u.id,
-        name: u.name,
-        department: u.roleMode === "driver" ? "Kỹ thuật" : "Vận hành",
-        tripsThisMonth: u.tripsCount,
-        co2SavedKg: u.co2SavedKg,
-      });
-    }
+    if (!u.companyId || !byCompany[u.companyId]) continue;
+    byCompany[u.companyId].employees.push({
+      userId: u.id,
+      name: u.name,
+      department: u.roleMode === "driver" ? "Kỹ thuật" : "Vận hành",
+      tripsThisMonth: u.tripsCount,
+      co2SavedKg: u.co2SavedKg,
+    });
+    const t = (totals[u.companyId] ??= { co2: 0, trips: 0, moneySaved: 0 });
+    t.co2 += u.co2SavedKg;
+    t.trips += u.tripsCount;
+    t.moneySaved += u.moneySaved;
   }
+
+  const months = lastMonths(3);
+  for (const companyId of Object.keys(byCompany)) {
+    const t = totals[companyId] ?? { co2: 0, trips: 0, moneySaved: 0 };
+    const co2Series = distributeGrowth(t.co2, 3);
+    const tripsSeries = distributeGrowth(t.trips, 3);
+    const moneySeries = distributeGrowth(t.moneySaved, 3);
+    byCompany[companyId].monthlyReports = months.map((month, i) => ({
+      month,
+      co2SavedKg: co2Series[i],
+      tripsShared: Math.round(tripsSeries[i]),
+      costSavedVnd: Math.round(moneySeries[i]),
+      parkingSpotsFreed: Math.max(0, Math.round(tripsSeries[i] / TRIPS_PER_PARKING_SPOT)),
+    }));
+  }
+
   return byCompany;
 }
 

@@ -39,9 +39,15 @@ export default function MatchResultsPage({ params }: { params: Promise<{ id: str
           Math.abs(new Date(t.departAt).getTime() - myDepart) < 60 * 60 * 1000
       )
       .map((t) => {
+        // Hành lang so khớp co giãn theo mức "chấp nhận đi vòng" trung bình của
+        // cả hai bên (300m ở 0% -> 1000m ở 50%) — chấp nhận đi vòng nhiều hơn
+        // nghĩa là hệ thống nới lỏng độ lệch lộ trình vẫn tính là "trùng nhau".
+        const avgDetour = (myTrip.detourTolerance + t.detourTolerance) / 2;
+        const corridorMeters = 300 + avgDetour * 1400;
         const { overlapPercent, sharedDistanceKm } = routeOverlapPercent(
           myTrip.route.waypoints,
-          t.route.waypoints
+          t.route.waypoints,
+          corridorMeters
         );
         return { trip: t, overlapPercent, sharedDistanceKm, owner: users[t.ownerId] };
       })

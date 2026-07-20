@@ -32,7 +32,7 @@ export default function ImpactPage() {
             <Leaf className="size-3.5" /> Tổng CO₂ đã cắt giảm
           </p>
           <p className="mt-1 text-3xl font-bold">{me.co2SavedKg.toFixed(1)} kg</p>
-          <p className="mt-1 text-xs opacity-80">Tương đương {treesEquivalent} cây xanh hấp thụ trong 1 tháng</p>
+          <p className="mt-1 text-xs opacity-80">Tương đương {treesEquivalent} cây xanh hấp thụ trong 1 năm</p>
           <div className="mt-3 h-24">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={co2Trend} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
