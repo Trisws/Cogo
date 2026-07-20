@@ -12,11 +12,13 @@ export function LocationPicker({
   value,
   onSelect,
   icon,
+  allowCurrentLocation = false,
 }: {
   placeholder: string;
   value?: GeocodeResult | null;
   onSelect: (r: GeocodeResult) => void;
   icon?: React.ReactNode;
+  allowCurrentLocation?: boolean;
 }) {
   const [query, setQuery] = useState(value?.label ?? "");
   const [results, setResults] = useState<GeocodeResult[]>([]);
@@ -89,21 +91,23 @@ export function LocationPicker({
       </div>
       {open && (
         <div className="absolute inset-x-0 top-[calc(100%+4px)] z-50 max-h-64 overflow-y-auto rounded-xl border border-border bg-popover shadow-lg">
-          <button
-            className="flex w-full items-center gap-2 border-b border-border px-3 py-2.5 text-left text-xs font-medium text-brand-green hover:bg-muted disabled:opacity-60"
-            disabled={locating}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              locateCurrentPosition();
-            }}
-          >
-            {locating ? (
-              <Loader2 className="size-3.5 shrink-0 animate-spin" />
-            ) : (
-              <LocateFixed className="size-3.5 shrink-0" />
-            )}
-            Vị trí hiện tại
-          </button>
+          {allowCurrentLocation && (
+            <button
+              className="flex w-full items-center gap-2 border-b border-border px-3 py-2.5 text-left text-xs font-medium text-brand-green hover:bg-muted disabled:opacity-60"
+              disabled={locating}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                locateCurrentPosition();
+              }}
+            >
+              {locating ? (
+                <Loader2 className="size-3.5 shrink-0 animate-spin" />
+              ) : (
+                <LocateFixed className="size-3.5 shrink-0" />
+              )}
+              Vị trí hiện tại
+            </button>
+          )}
 
           {results.map((r, i) => (
             <button

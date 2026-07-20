@@ -127,6 +127,7 @@ function NewTripForm() {
             value={origin}
             onSelect={setOrigin}
             icon={<div className="size-2.5 shrink-0 rounded-full bg-brand-green" />}
+            allowCurrentLocation
           />
           <LocationPicker
             placeholder="Điểm đến"
